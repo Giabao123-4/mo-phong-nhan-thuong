@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Không Gian Trải Nghiệm Học Tập Số - Tình Huống 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================================
+           QUẢN LÝ CHUYỂN ĐỔI CÁC MÀN HÌNH (SPA VIEW MANAGER)
+           ======================================================== */
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+        .app-view { display: none; min-height: 100vh; width: 100%; position: relative; }
+        .app-view.active-view { display: block; }
+
+        /* ========================================================
+           VIEW 1 & 2: TRANG CHỦ & TIN NHẮN MÔ PHỎNG
+           ======================================================== */
+        #view-home, #view-hook {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #1e293b;
+            padding: 40px 20px;
+        }
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            text-align: center;
+        }
+        .logo-huedu {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            width: 150px;
+            height: auto;
+            object-fit: contain;
+            z-index: 10;
+        }
+        .header-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0369a1;
+            margin: 0 0 25px 0;
+            padding-top: 10px;
+        }
+        .top-nav {
+            display: inline-flex;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            padding: 6px;
+            border-radius: 999px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 35px;
+            gap: 6px;
+        }
+        .nav-pill {
+            padding: 10px 24px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: #475569;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-pill:hover { color: #0284c7; }
+        .nav-pill.active {
+            background: #0ea5e9;
+            color: white;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Card Tình huống ngoài Trang chủ */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 420px));
+            justify-content: center;
+            gap: 25px;
+            margin-top: 10px;
+        }
+        .scenario-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            text-align: left;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 35px rgba(2, 132, 199, 0.12);
+        }
+        .card-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0 0 18px 0;
+        }
+        .card-body {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .card-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .card-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        }
+        .icon-purple {
+            background: linear-gradient(135deg, #f3e8ff, #d8b4fe);
+            color: #7e22ce;
+        }
+        .btn-start {
+            background: linear-gradient(90deg, #0ea5e9, #2563eb);
+            color: white;
+            text-decoration: none;
+            padding: 9px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+        }
+        .btn-start:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+        .card-right p {
+            margin: 0;
+            color: #475569;
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
+        /* Khu vực Luyện tập */
+        .training-container {
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            padding: 40px;
+            margin-top: 20px;
+            position: relative;
+            color: #334155;
+            text-align: left;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .timeline-line {
+            position: absolute; left: 64px; top: 60px; bottom: 60px;
+            width: 2px; background-color: #cbd5e1;
+        }
+        .level-row {
+            display: flex; align-items: flex-start; margin-bottom: 30px;
+            position: relative; z-index: 2;
+        }
+        .level-row:last-child { margin-bottom: 0; }
+        .level-node {
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            margin-right: 20px; background-color: #f1f5f9;
+            border: 2px solid #cbd5e1; flex-shrink: 0; z-index: 2; color: #94a3b8;
+        }
+        .level-node.active {
+            background-color: #ffffff; border-color: #0ea5e9; color: #0ea5e9;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
+        }
+        .level-card {
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px; padding: 24px; flex-grow: 1;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.2s;
+        }
+        .level-card.active {
+            border-color: #0ea5e9; background-color: #ffffff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+        .level-info { flex-grow: 1; padding-right: 20px; }
+        .level-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        .level-title { font-size: 18px; color: #0f172a; font-weight: 700; margin: 0 0 10px 0; display: flex; align-items: center; gap: 10px; }
+        .tag-mail { background: #e2e8f0; color: #475569; font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+        .threat-indicator { display: flex; align-items: center; gap: 5px; font-size: 12px; margin-bottom: 12px; color: #64748b; font-weight: 600; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
+        .dot.active { background: #f59e0b; }
+        .level-desc { font-size: 14px; font-style: italic; margin: 0; color: #475569; line-height: 1.5; }
+        .level-action { display: flex; flex-direction: column; align-items: flex-end; min-width: 130px; }
+        .status-text-train { font-size: 13px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .status-text-train.ready { color: #0284c7; }
+        .btn-level { padding: 12px 30px; border-radius: 8px; font-weight: bold; font-size: 14px; border: none; cursor: pointer; text-align: center; width: 100%; transition: 0.2s; }
+        .btn-level.primary { background: linear-gradient(90deg, #0ea5e9, #2563eb); color: white; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
+
+        /* ========================================================
+           CSS LUỒNG KIỂM CHỨNG / LÀM TIẾP / BỎ QUA
+           ======================================================== */
+        .phone-mockup {
+            width: 380px;
+            max-width: 92vw;
+            background: #ffffff;
+            border-radius: 32px;
+            border: 10px solid #1e293b;
+            padding: 28px 22px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            transition: width 0.25s ease;
+        }
+        .phone-mockup.analysis-wide {
+            width: 850px;
+            max-width: 92vw;
+        }
+        .sms-header {
+            text-align: center;
+            font-weight: 700;
+            color: #475569;
+            font-size: 15px;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .sms-bubble {
+            background: #f1f5f9;
+            color: #1e293b;
+            padding: 18px;
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            font-size: 15px;
+            line-height: 1.6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .fake-link {
+            color: #2563eb;
+            font-weight: 700;
+            text-decoration: underline;
+            word-break: break-all;
+            cursor: pointer;
+        }
+        .fake-link:hover { color: #1d4ed8; }
+
+        .sms-actions {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sms-action-btn {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: filter 0.15s, transform 0.1s;
+        }
+        .sms-action-btn:hover { filter: brightness(1.05); }
+        .sms-action-btn:active { transform: scale(0.99); }
+        .verify-btn { background: #2563eb; color: white; }
+        .continue-btn { background: #dc2626; color: white; }
+        .skip-btn { background: #6b7280; color: white; }
+        .back-btn { background: #e5e7eb; color: #111827; }
+
+        .verify-layout {
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            gap: 20px;
+            margin-top: 10px;
+            align-items: stretch;
+        }
+        .verify-message-box,
+        .verify-guide-box {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .verify-message-box {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+        }
+        .verify-guide-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            min-height: 520px;
+        }
+        .verify-message-box h3,
+        .verify-guide-box h3 { margin-top: 0; margin-bottom: 18px; }
+        .verify-message-box h3 { color: #374151; }
+        .verify-guide-box h3 { color: #1d4ed8; }
+
+        .guide-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .guide-item {
+            display: flex; align-items: flex-start;
+            background: #ffffff; border-radius: 10px; padding: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid #e5e7eb;
+            border-left: 4px solid #3b82f6; transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .guide-item:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+        .guide-item.danger-item { border-left-color: #ef4444; }
+        .guide-icon {
+            font-size: 22px; margin-right: 14px; flex-shrink: 0;
+            background: #f1f5f9; width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center; border-radius: 50%;
+        }
+        .guide-item.danger-item .guide-icon { background: #fef2f2; }
+        .guide-content { font-size: 13.5px; line-height: 1.5; color: #4b5563; }
+        .guide-content strong { color: #1e40af; display: block; margin-bottom: 3px; font-size: 14.5px; }
+        .guide-item.danger-item .guide-content strong { color: #b91c1c; }
+
+        @media (max-width: 750px) {
+            .verify-layout { grid-template-columns: 1fr; }
+            .verify-guide-box { min-height: auto; }
+        }
+
+        /* KHUNG NHẬP DẤU HIỆU LỪA ĐẢO ĐÃ ĐƯỢC LÀM ĐẸP HIỆN ĐẠI, SANG TRỌNG */
+        .skip-reason-box {
+            display: none;
+            margin-top: 18px;
+            padding: 20px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #86efac;
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.15);
+            text-align: left;
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .skip-reason-box label {
+            display: block;
+            font-weight: 700;
+            font-size: 14.5px;
+            color: #166534;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .skip-reason-box textarea {
+            width: 100%;
+            min-height: 95px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #86efac;
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #1e293b;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .skip-reason-box textarea:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15), inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .skip-error-msg {
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: none;
+        }
+        .btn-confirm-skip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 14px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-confirm-skip:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+        }
+        .btn-confirm-skip:active {
+            transform: translateY(1px);
+        }
+
+        /* Màn hình Phân tích khi học sinh Bỏ qua an toàn */
+        .analysis-box { width: 100%; box-sizing: border-box; margin-top: 10px; text-align: left; }
+        .analysis-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 20px; color: #15803d; }
+        .analysis-card {
+            width: 100%; box-sizing: border-box; background: #fff;
+            border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;
+        }
+        .analysis-card h3 { margin: 0 0 10px; font-size: 17px; }
+        .analysis-card p { margin: 0; line-height: 1.6; }
+        .analysis-danger { background: #fef2f2; border-color: #fecaca; }
+        .analysis-safe { background: #f0fdf4; border-color: #bbf7d0; }
+        .analysis-warning { background: #fffbeb; border-color: #fde68a; }
+        .analysis-url {
+            display: block; margin-top: 9px; margin-bottom: 10px; padding: 11px 13px;
+            border-radius: 8px; background: #f3f4f6; color: #b91c1c; font-weight: 600; word-break: break-all;
+        }
+
+        /* ========================================================
+           VIEW 3: GIAO DIỆN PHISHING NGÂN HÀNG 100% GỐC
+           ======================================================== */
+        #view-phishing {
+            font-family: 'Montserrat', sans-serif;
+            background: #c60000;
+            overflow-x: hidden;
+            user-select: none;
+        }
+        #view-phishing.active-view {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .promo-container {
+            position: relative;
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: radial-gradient(circle at 50% 60%, #ff3333 0%, #a60000 80%, #660000 100%);
+        }
+        .sunburst {
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: repeating-conic-gradient(from 0deg at 50% 65%, transparent 0deg 8deg, rgba(255, 255, 255, 0.08) 8deg 16deg);
+            z-index: 1; pointer-events: none;
+            animation: rotateSunburst 60s linear infinite;
+        }
+        @keyframes rotateSunburst {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .confetti-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;
+        }
+        .confetti {
+            position: absolute; width: 8px; height: 16px; background: #ffd700;
+            animation: fall linear infinite; opacity: 0;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .mydata-logo {
+            position: absolute; top: 20px; right: 30px;
+            background: transparent;
+            border-radius: 8px; padding: 8px 12px;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 10;
+            border: 2px solid white;
+        }
+        .mydata-logo svg { width: 35px; height: 35px; fill: white; margin-bottom: 2px;}
+        .mydata-logo span { color: white; font-size: 14px; font-weight: 900; letter-spacing: 1px;}
+
+        .back-sim-btn {
+            position: absolute; top: 20px; left: 30px; z-index: 10;
+            color: white; text-decoration: none; font-size: 24px;
+            background: rgba(0,0,0,0.3); width: 45px; height: 45px;
+            display: flex; justify-content: center; align-items: center; border-radius: 50%;
+            backdrop-filter: blur(4px); transition: 0.2s; cursor: pointer;
+        }
+        .back-sim-btn:hover { background: rgba(0,0,0,0.5); }
+
+        .title-group {
+            position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; margin-top: 60px;
+        }
+        .box-blue {
+            background: #002266;
+            color: white; font-size: 32px; font-weight: 900;
+            padding: 12px 35px; border: 4px solid #ffca28; border-radius: 12px;
+            transform: rotate(-3deg);
+            box-shadow: 0 8px 0 #000c24, 0 15px 25px rgba(0,0,0,0.5);
+            margin-bottom: -15px; position: relative; z-index: 2;
+        }
+        .box-red {
+            background: #d32f2f;
+            color: white; font-size: 28px; font-weight: 900;
+            padding: 15px 50px; border: 4px solid white; border-radius: 12px;
+            transform: rotate(3deg);
+            box-shadow: 0 8px 0 #800000, 0 15px 25px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        .text-yellow { color: #ffca28; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .date-text {
+            color: #fff; font-size: 18px; font-weight: 700; margin-top: 35px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        .center-prize {
+            position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;
+            margin-top: 30px; justify-content: center; flex-grow: 1; margin-bottom: 50px;
+        }
+        .prize-sub {
+            font-size: 30px; color: white; font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: -15px; z-index: 4; letter-spacing: 2px;
+        }
+        .prize-amount {
+            font-size: 160px; color: #ffca28; font-weight: 900; line-height: 1;
+            text-shadow: 0 6px 0 #e65100, 0 12px 0 #bf360c, 0 20px 40px rgba(0,0,0,0.8);
+            z-index: 4; position: relative;
+            filter: drop-shadow(0 0 20px rgba(255, 193, 7, 0.5));
+            animation: pulse-glow 2s infinite alternate;
+        }
+        @keyframes pulse-glow {
+            0% { filter: drop-shadow(0 0 15px rgba(255, 193, 7, 0.4)) scale(1); }
+            100% { filter: drop-shadow(0 0 35px rgba(255, 235, 59, 0.8)) scale(1.03); }
+        }
+
+        .btn-claim-huge {
+            background: linear-gradient(to bottom, #ffeb3b, #ffb300);
+            color: #b71c1c; font-size: 28px; font-weight: 900;
+            padding: 18px 50px; border-radius: 50px; border: 4px solid white;
+            box-shadow: 0 8px 0 #e65100, 0 15px 30px rgba(0,0,0,0.5);
+            cursor: pointer; z-index: 20; position: relative; margin-top: 30px;
+            text-transform: uppercase; letter-spacing: 1px;
+            animation: bounce-btn 1.5s infinite; transition: all 0.1s;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .btn-claim-huge:active {
+            transform: translateY(8px); box-shadow: 0 0 0 #e65100, 0 5px 10px rgba(0,0,0,0.5);
+        }
+        @keyframes bounce-btn {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        .floating-tag {
+            position: absolute; background: white; color: #d32f2f; font-weight: 900;
+            padding: 8px 18px; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            z-index: 5; animation: floatTag 4s ease-in-out infinite;
+            font-size: 26px; transform-origin: center;
+        }
+        .tag-1 { top: 20%; left: 15%; transform: rotate(-20deg); }
+        .tag-2 { top: 25%; right: 15%; transform: rotate(20deg); animation-delay: 1s;}
+        .tag-3 { bottom: 25%; left: 18%; transform: rotate(15deg); animation-delay: 2s;}
+        .tag-4 { bottom: 20%; right: 18%; transform: rotate(-20deg); animation-delay: 0.5s;}
+        
+        @keyframes floatTag {
+            0%, 100% { transform: translateY(0) rotate(var(--rot)); }
+            50% { transform: translateY(-20px) rotate(var(--rot)); }
+        }
+
+        .promo-footer {
+            background: #e65100; color: white; text-align: center;
+            padding: 15px; font-size: 16px; font-weight: 900;
+            position: relative; z-index: 20; border-top: 3px solid #bf360c;
+            text-transform: uppercase;
+        }
+
+        .form-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(40, 0, 0, 0.65); 
+            backdrop-filter: blur(12px);
+            z-index: 100; justify-content: center; align-items: center;
+            animation: fadeInOverlay 0.3s ease;
+        }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+        .form-card {
+            background: #fff; 
+            background-image: radial-gradient(circle at top right, #fffdf2 0%, #ffffff 60%);
+            width: 90%; max-width: 420px; border-radius: 20px;
+            padding: 30px; 
+            box-shadow: 0 0 40px rgba(255, 202, 40, 0.4), 0 20px 50px rgba(0,0,0,0.6);
+            border: 3px solid #ffca28; position: relative;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 92vh; overflow-y: auto;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .close-btn {
+            position: absolute; top: 10px; right: 10px; background: #fff; border: 2px solid #ddd;
+            width: 36px; height: 36px; border-radius: 50%; font-size: 18px; font-weight: bold;
+            color: #555; cursor: pointer; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s; z-index: 10;
+        }
+        .close-btn:hover { background: #d32f2f; color: white; border-color: #d32f2f; transform: scale(1.1); }
+
+        .form-header-icon {
+            font-size: 45px; text-align: center; margin-top: -10px; margin-bottom: 5px;
+            animation: tada 2s infinite;
+        }
+        @keyframes tada {
+            0% { transform: scale(1); }
+            10%, 20% { transform: scale(0.9) rotate(-3deg); }
+            30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+            40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+            100% { transform: scale(1); }
+        }
+
+        .form-title {
+            text-align: center; color: #d32f2f; font-size: 26px; font-weight: 900; margin: 0 0 10px 0;
+            background: linear-gradient(to right, #d32f2f, #e65100);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .form-desc {
+            text-align: center; color: #555; font-size: 13.5px; margin-bottom: 20px; font-weight: 600; line-height: 1.5;
+        }
+
+        .fake-countdown {
+            background: #fff9e6; color: #b78103; text-align: center; padding: 10px;
+            border-radius: 8px; font-weight: 700; font-size: 14px; margin-bottom: 20px;
+            border: 1px dashed #ffca28; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .fake-countdown span { color: #d32f2f; font-size: 16px; font-weight: 900; font-variant-numeric: tabular-nums;}
+
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label {
+            display: block; font-size: 13.5px; font-weight: 800; margin-bottom: 8px; color: #333;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 10px;
+            box-sizing: border-box; font-size: 15px; font-family: inherit; font-weight: 400;
+            background: #fafafa; color: #222; outline: none; transition: all 0.3s;
+        }
+        .form-group select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23555%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px top 50%;
+            background-size: 12px auto;
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+        }
+        .form-group input:focus, .form-group select:focus { 
+            border-color: #ffca28; background: white; 
+            box-shadow: 0 0 0 4px rgba(255, 202, 40, 0.15);
+        }
+        .btn-submit {
+            position: relative; overflow: hidden;
+            width: 100%; padding: 16px; background: linear-gradient(to right, #d32f2f, #b30000);
+            color: white; border: none; border-radius: 10px; font-size: 17px; font-weight: 900;
+            cursor: pointer; margin-top: 10px; box-shadow: 0 6px 15px rgba(211,47,47,0.4);
+            transition: all 0.2s; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(211,47,47,0.5); }
+        .btn-submit:active { transform: translateY(2px); }
+        .btn-submit::after {
+            content: ''; position: absolute; top: -50%; left: -60%; width: 20%; height: 200%;
+            background: rgba(255,255,255,0.3); transform: rotate(30deg);
+            animation: shine-sweep 3s infinite;
+        }
+        @keyframes shine-sweep {
+            0% { left: -60%; }
+            20% { left: 150%; }
+            100% { left: 150%; }
+        }
+        .trust-badges {
+            display: flex; justify-content: center; gap: 20px; margin-top: 20px;
+            font-size: 12px; color: #777; font-weight: 600; border-top: 1px solid #eee; padding-top: 15px;
+        }
+        .trust-badges span { display: flex; align-items: center; gap: 5px; }
+
+        @media (max-width: 768px) {
+            .prize-amount { font-size: 100px; }
+            .box-blue { font-size: 22px; padding: 10px 25px; }
+            .box-red { font-size: 20px; padding: 12px 35px; }
+            .btn-claim-huge { font-size: 22px; padding: 15px 40px; }
+            .floating-tag { font-size: 20px; padding: 6px 12px; }
+            .form-card { padding: 25px 20px; }
+        }
+
+        /* ========================================================
+           VIEW 4: PHÂN TÍCH CẢNH BÁO
+           ======================================================== */
+        #view-feedback {
+            font-family: 'Inter', sans-serif; 
+            background-color: #f1f5f9; 
+            padding: 40px 16px;
+            color: #334155;
+        }
+        #view-feedback.active-view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.98); 
+            backdrop-filter: blur(10px); 
+            width: 100%;
+            max-width: 768px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border-top: 8px solid #dc2626;
+        }
+        .header-alert {
+            background-color: #fef2f2;
+            padding: 24px 32px;
+            text-align: center;
+            border-bottom: 1px solid #fee2e2;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-bg-icon {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            color: #fee2e2;
+            opacity: 0.5;
+            pointer-events: none;
+            width: 160px;
+            height: 160px;
+        }
+        .pulse-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background-color: #fee2e2;
+            border-radius: 50%;
+            margin-bottom: 12px;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            font-size: 30px;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .title-main {
+            font-size: 30px;
+            font-weight: 900;
+            color: #b91c1c;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin: 0;
+        }
+        .title-sub {
+            color: #7f1d1d;
+            margin-top: 8px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .content-section {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        .danger-step {
+            background-color: #ffffff;
+            border-left: 4px solid #ef4444;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            transition: transform 0.2s;
+        }
+        .danger-step:hover { transform: translateY(-4px); }
+        .section-heading {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .danger-step p {
+            color: #374151;
+            line-height: 1.6;
+            font-weight: 500;
+            margin: 0;
+        }
+        .hacker-bg { 
+            background: #0f172a; 
+            color: #10b981; 
+            font-family: 'Courier New', Courier, monospace; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hacker-bg ul {
+            list-style: none;
+            font-size: 14px;
+            position: relative;
+            z-index: 20;
+            margin: 0; padding: 0;
+        }
+        .hacker-bg li { margin-bottom: 8px; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-green-500 { color: #22c55e; }
+        .text-blue-400 { color: #60a5fa; }
+        .text-white { color: #ffffff; }
+        .text-red-500 { color: #ef4444; }
+        .font-bold { font-weight: 700; }
+        .bg-green-900-50 { background-color: rgba(20, 83, 45, 0.5); padding: 0 4px; }
+        .scanlines::before {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+        .url-warning {
+            background-color: #fffbeb;
+            border: 2px solid #fde68a;
+            padding: 20px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .url-warning-bg-icon {
+            position: absolute; top: 0; right: 0; padding: 16px;
+            opacity: 0.1; font-size: 60px; pointer-events: none;
+        }
+        .url-box {
+            background-color: #ffffff; padding: 16px; border-radius: 8px;
+            border: 1px solid #fcd34d; font-family: monospace; color: #dc2626;
+            font-weight: 700; word-break: break-all; text-align: center;
+            font-size: 18px; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            position: relative; z-index: 10;
+        }
+        .btn-ai {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; background-color: #2563eb; color: white; font-weight: 700;
+            padding: 12px 32px; border-radius: 12px; text-decoration: none; border: none;
+            cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s; font-size: 16px; margin-top: 20px; position: relative; z-index: 10;
+        }
+        .btn-ai:hover { background-color: #1d4ed8; }
+        .btn-ai svg { width: 20px; height: 20px; }
+
+        .grid-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+        @media (min-width: 640px) { .grid-cards { grid-template-columns: 1fr 1fr; } }
+        .card-item {
+            background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 20px;
+            border-radius: 12px; transition: all 0.2s;
+        }
+        .card-item:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); transform: translateY(-4px); }
+        .card-item h3 { font-weight: 700; color: #1e40af; font-size: 16px; border-bottom: 1px solid #dbeafe; padding-bottom: 8px; margin: 0 0 8px 0; }
+        .card-item p { font-size: 14px; color: #334155; line-height: 1.6; font-weight: 500; margin: 0; }
+
+        .strategies { background-color: #ecfdf5; border: 1px solid #a7f3d0; padding: 20px; border-radius: 12px; }
+        .strategies ul { list-style: none; display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; }
+        .strategies li { display: flex; align-items: flex-start; gap: 12px; }
+        .strategies span.text-gray-800 { color: #1f2937; line-height: 1.6; font-weight: 500; }
+
+        .footer-nav {
+            background-color: #f8fafc; padding: 24px; border-top: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; gap: 16px; align-items: center; justify-content: center;
+        }
+        @media (min-width: 640px) { .footer-nav { flex-direction: row; } }
+        .btn-nav {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px 32px; border-radius: 12px; font-weight: 700; text-decoration: none;
+            transition: all 0.2s; width: 100%; cursor: pointer; font-size: 15px;
+        }
+        @media (min-width: 640px) { .btn-nav { width: auto; } }
+        .btn-dark { background-color: #1e293b; color: white; border: none; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-dark:hover { background-color: #0f172a; }
+        .btn-light { background-color: white; color: #1f2937; border: 2px solid #d1d5db; }
+        .btn-light:hover { background-color: #f9fafb; }
+        .btn-nav svg { width: 20px; height: 20px; }
+
+        /* ========================================================
+           VIEW 5: HỆ THỐNG PHÂN TÍCH URL
+           ======================================================== */
+        #view-analyzer {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: #333;
+            padding: 40px 20px;
+        }
+        .analyzer-container { max-width: 1100px; margin: 0 auto; }
+        .analyzer-header { text-align: center; margin-bottom: 35px; }
+        .analyzer-header h1 { font-size: 32px; font-weight: 700; color: #0369a1; margin: 0 0 10px; }
+        .analyzer-header p { color: #475569; font-size: 15px; margin: 6px 0; }
+        .analyzer-header .disclaimer { font-size: 13px; color: #64748b; max-width: 750px; margin: 10px auto 0; }
+        .search-box {
+            display: flex; background: white; padding: 10px; border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); margin-bottom: 35px;
+        }
+        .search-box input {
+            flex: 1; border: none; padding: 15px 20px; font-size: 16px;
+            font-family: monospace; outline: none; background: transparent; color: #1e293b;
+        }
+        .search-box button {
+            background: #0ea5e9; color: white; border: none; padding: 0 30px;
+            border-radius: 9px; font-size: 16px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: 0.2s;
+        }
+        .search-box button:hover { background: #0284c7; }
+        .url-card {
+            background: white; border-radius: 14px; padding: 18px 22px;
+            margin-bottom: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.04);
+        }
+        .url-label { font-size: 12px; color: #64748b; margin-bottom: 7px; font-weight: 600; text-transform: uppercase; }
+        .url-value { font-family: monospace; font-size: 15px; color: #0f172a; word-break: break-all; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        @media (max-width: 800px) { .result-grid { grid-template-columns: 1fr; } }
+        .ana-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+        .status-container { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 0 20px; }
+        .status-icon { width: 85px; height: 85px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 42px; margin-bottom: 15px; }
+        .status-icon.safe { background: #dcfce7; color: #16a34a; }
+        .status-icon.warning { background: #fef3c7; color: #d97706; }
+        .status-icon.danger { background: #fee2e2; color: #dc2626; }
+        .status-text { font-size: 21px; font-weight: 700; }
+        .status-text.safe { color: #16a34a; }
+        .status-text.warning { color: #d97706; }
+        .status-text.danger { color: #dc2626; }
+        .score-wrapper { text-align: center; margin-bottom: 20px; }
+        .score-badge { display: inline-block; padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 14px; }
+        .score-safe { background: #dcfce7; color: #166534; }
+        .score-warn { background: #fef3c7; color: #92400e; }
+        .score-danger { background: #fee2e2; color: #991b1b; }
+        .section-title { font-size: 17px; font-weight: 700; color: #0369a1; margin: 0 0 15px; display: flex; align-items: center; gap: 8px; }
+        .domain-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .domain-row { display: flex; justify-content: space-between; gap: 20px; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+        .domain-row:last-child { border-bottom: none; }
+        .domain-name { color: #64748b; font-size: 13px; }
+        .domain-value { text-align: right; font-weight: 600; font-size: 13px; word-break: break-word; }
+        .domain-good { color: #16a34a; }
+        .domain-neutral { color: #d97706; }
+        .detection-list { list-style: none; padding: 0; margin: 0; }
+        .detection-list li { position: relative; padding: 11px 12px 11px 35px; margin-bottom: 10px; background: #f8fafc; border-radius: 9px; font-size: 14px; line-height: 1.55; color: #475569; }
+        .detection-list li::before { content: "⚠"; position: absolute; left: 11px; top: 10px; color: #f59e0b; }
+        .ai-explanation { background: #eff6ff; border-left: 4px solid #0ea5e9; border-radius: 8px; padding: 15px; margin-top: 20px; color: #334155; font-size: 14px; line-height: 1.6; }
+        .back-link-container { text-align: center; margin-top: 35px; padding-bottom: 20px; }
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px; background: #dbeafe;
+            color: #0369a1; padding: 12px 24px; border-radius: 8px; text-decoration: none;
+            font-weight: 600; font-size: 15px; transition: 0.2s; cursor: pointer; border: none;
+        }
+        .btn-back:hover { background: #bfdbfe; color: #075985; }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================================
+         VIEW 1: TRANG CHỦ (index.html)
+         ======================================================== -->
+    <div id="view-home" class="app-view active-view">
+        <div class="dashboard-container">
+            <img src="static/logo_huedu.png" class="logo-huedu" alt="Hue University of Education" onerror="this.style.display='none'">
+
+            <h1 class="header-title">Không Gian Trải Nghiệm Học Tập Số</h1>
+            
+            <div class="top-nav">
+                <a onclick="switchHomeTab('sim')" id="nav-sim" class="nav-pill active">Công cụ mô phỏng</a>
+                <a onclick="openAnalyzerDirect()" class="nav-pill">Phân tích URL</a>
+                <a onclick="switchHomeTab('train')" id="nav-train" class="nav-pill">Luyện tập</a>
+            </div>
+            
+            <!-- TAB 1: CÔNG CỤ MÔ PHỎNG -->
+            <div id="tab-sim" class="tab-content active">
+                <div class="scenario-grid">
+                    <div class="scenario-card">
+                        <h3 class="card-title">Nhận ngay quà tặng 500.000đ</h3>
+                        <div class="card-body">
+                            <div class="card-left">
+                                <div class="card-icon icon-purple">🎁</div>
+                                <button onclick="startScenario2()" class="btn-start">Bắt đầu</button>
+                            </div>
+                            <div class="card-right">
+                                <p>Học sinh trải nghiệm tình huống mô phỏng để nhận diện các thủ đoạn lừa đảo tinh vi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: LUYỆN TẬP -->
+            <div id="tab-train" class="tab-content">
+                <div class="training-container">
+                    <div class="timeline-line"></div>
+                    <div class="level-row">
+                        <div class="level-node active">★</div>
+                        <div class="level-card active">
+                            <div class="level-info">
+                                <div class="level-label">CẤP ĐỘ 1 • KỊCH BẢN MỒI NHỬ TÀI CHÍNH</div>
+                                <h4 class="level-title">Nhận ngay quà tặng 500.000đ <span class="tag-mail">SMS / LINK</span></h4>
+                                <div class="threat-indicator">
+                                    Mức độ tinh vi:
+                                    <span class="dot active"></span>
+                                    <span class="dot active"></span>
+                                    <span class="dot active"></span>
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                </div>
+                                <p class="level-desc">"Phân tích tin nhắn trúng thưởng giả mạo và nhận biết sự vô lý khi trang web yêu cầu nhập mã OTP để nhận tiền."</p>
+                            </div>
+                            <div class="level-action">
+                                <div class="status-text-train ready">● Sẵn sàng</div>
+                                <button onclick="startScenario2()" class="btn-level primary">Thực hành</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         VIEW 2: MÀN HÌNH TIN NHẮN MỒI NHỬ + LUỒNG KIỂM CHỨNG
+         ======================================================== -->
+    <div id="view-hook" class="app-view">
+        <div class="dashboard-container" style="display:flex; justify-content:center; align-items:center; min-height:80vh;">
+            <div class="phone-mockup" id="hookPhoneMockup">
+
+                <!-- Header tin nhắn -->
+                <div class="sms-header" id="hookSmsHeader">
+                    Tin nhắn từ: Hệ thống Ưu đãi
+                </div>
+
+                <!-- BƯỚC 1: HOOK BAN ĐẦU (Đã đổi nút thành TRẢI NGHIỆM và xóa nút quay lại trang chủ) -->
+                <div id="hook-step-hook">
+                    <div class="sms-bubble">
+                        🎉 CHÚC MỪNG! Bạn đã được lựa chọn nhận phần quà trị giá 500.000đ từ chương trình “Nạp đầy data, bao la quà tặng”! Phần quà đang chờ bạn xác nhận, hãy nhấn vào liên kết bên dưới để xác nhận thông tin và nhận quà ngay trước khi chương trình kết thúc!
+                        <br><br>
+                        <a onclick="setHookStep('choice')" class="fake-link">
+                            http://thuong-ngan-hang-2026.vn/nhan-thuong
+                        </a>
+                    </div>
+                    <div class="sms-actions">
+                        <button type="button" onclick="setHookStep('choice')" class="sms-action-btn verify-btn">
+                            TRẢI NGHIỆM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BƯỚC 2: LỰA CHỌN KIỂM CHỨNG HAY LÀM TIẾP -->
+                <div id="hook-step-choice" style="display:none;">
+                    <div class="sms-bubble">
+                        🎉 CHÚC MỪNG! Bạn đã được lựa chọn nhận phần quà trị giá 500.000đ! Phần quà đang chờ bạn xác nhận, hãy nhấn vào liên kết bên dưới để xác nhận thông tin và nhận quà ngay trước khi chương trình kết thúc.
+                        <br><br>
+                        <span class="fake-link" onclick="navigateTo('view-phishing')">http://thuong-ngan-hang-2026.vn/nhan-thuong</span>
+                    </div>
+                    <div style="margin-top:25px; text-align:center; font-weight:700; font-size:17px;">
+                        Khi gặp tin nhắn như thế này, bạn sẽ làm gì?
+                    </div>
+                    <div class="sms-actions">
+                        <button type="button" onclick="setHookStep('verify')" class="sms-action-btn verify-btn">
+                            KIỂM CHỨNG
+                        </button>
+                        <button type="button" onclick="navigateTo('view-phishing')" class="sms-action-btn continue-btn">
+                            LÀM TIẾP
+                        </button>
+                    </div>
+                    <div style="text-align:center;margin-top:15px;">
+                        <a onclick="navigateTo('view-home')" style="text-decoration:none; color:#0369a1; font-weight:600; cursor:pointer;">
+                            Quay lại Trang chủ
+                        </a>
+                    </div>
+                </div>
+
+                <!-- BƯỚC 3: GIAO DIỆN KIỂM CHỨNG 2 CỘT -->
+                <div id="hook-step-verify" style="display:none;">
+                    <div class="verify-layout">
+                        <div class="verify-message-box">
+                            <h3 style="margin-bottom:15px;">📱 Tin nhắn mô phỏng</h3>
+                            <div class="sms-header" style="margin-top: 0; margin-bottom: 10px;">
+                                Tin nhắn từ: Hệ thống Ưu đãi
+                            </div>
+                            <div class="sms-bubble" style="margin: 0; border: 1px solid #e5e7eb;">
+                                🎉 CHÚC MỪNG! Bạn đã được lựa chọn nhận phần quà trị giá 500.000đ! Phần quà đang chờ bạn xác nhận, hãy nhấn vào liên kết bên dưới để xác nhận thông tin và nhận quà ngay trước khi chương trình kết thúc.
+                                <br><br>
+                                <span class="fake-link">
+                                    http://thuong-ngan-hang-2026.vn/nhan-thuong
+                                </span>
+                            </div>
+                            <div class="sms-actions">
+                                <button type="button" onclick="setHookStep('choice_verified')" class="sms-action-btn back-btn">
+                                    QUAY LẠI LỰA CHỌN
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="verify-guide-box">
+                            <h3>🔎 Hướng dẫn kiểm chứng</h3>
+                            <div class="guide-list">
+                                <div class="guide-item">
+                                    <div class="guide-icon">👤</div>
+                                    <div class="guide-content">
+                                        <strong>Kiểm tra người gửi</strong>
+                                        Không chỉ dựa vào tên hiển thị như “Hệ thống Ưu đãi”. Hãy kiểm tra nguồn gửi có thực sự thuộc ngân hàng hoặc nhà mạng chính thức hay không.
+                                    </div>
+                                </div>
+                                <div class="guide-item">
+                                    <div class="guide-icon">🎁</div>
+                                    <div class="guide-content">
+                                        <strong>Cảnh giác mồi nhử trúng thưởng</strong>
+                                        Những thông báo tặng tiền mặt hoặc quà giá trị cao bất ngờ thường là chiêu trò đánh vào lòng tham để làm người nhận mất cảnh giác.
+                                    </div>
+                                </div>
+                                <div class="guide-item">
+                                    <div class="guide-icon">🔗</div>
+                                    <div class="guide-content">
+                                        <strong>Kiểm tra đường link</strong>
+                                        Quan sát kỹ tên miền trước khi truy cập. Không nên tin tưởng chỉ vì URL có chứa từ khóa như “thuong-ngan-hang”.
+                                    </div>
+                                </div>
+                                <div class="guide-item">
+                                    <div class="guide-icon">🏛️</div>
+                                    <div class="guide-content">
+                                        <strong>Đối chiếu với kênh chính thức</strong>
+                                        Nếu cần kiểm tra ưu đãi, hãy tự mở ứng dụng ngân hàng/ví điện tử chính thức thay vì nhấn trực tiếp vào đường link trong tin nhắn.
+                                    </div>
+                                </div>
+                                <div class="guide-item danger-item">
+                                    <div class="guide-icon">🛑</div>
+                                    <div class="guide-content">
+                                        <strong>Nhận tiền KHÔNG cần mã OTP</strong>
+                                        Tuyệt đối không nhập Số tài khoản, mật khẩu hoặc mã OTP vào một đường link lạ để “nhận thưởng”.
+                                    </div>
+                                </div>
+                                <div class="guide-item danger-item">
+                                    <div class="guide-icon">⏳</div>
+                                    <div class="guide-content">
+                                        <strong>Cảnh giác với sự thúc giục</strong>
+                                        Các cụm từ như “nhận quà ngay trước khi chương trình kết thúc” là chiêu trò tâm lý tạo áp lực thời gian để bạn vội vàng làm theo.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top:18px;">
+                                <button type="button" onclick="openAnalyzerFromVerify('http://thuong-ngan-hang-2026.vn/nhan-thuong')" class="sms-action-btn verify-btn" style="width:100%; box-sizing:border-box;">
+                                    🔎 PHÂN TÍCH URL NÀY
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BƯỚC 4: SAU KHI KIỂM CHỨNG QUAY LẠI (CÓ RÀNG BUỘC NHẬP DẤU HIỆU MỚI ĐƯỢC BỎ QUA) -->
+                <div id="hook-step-choice-verified" style="display:none;">
+                    <div class="sms-bubble">
+                        🎉 CHÚC MỪNG! Bạn đã được lựa chọn nhận phần quà trị giá 500.000đ! Phần quà đang chờ bạn xác nhận, hãy nhấn vào liên kết bên dưới để xác nhận thông tin và nhận quà ngay trước khi chương trình kết thúc.
+                        <br><br>
+                        <span class="fake-link">http://thuong-ngan-hang-2026.vn/nhan-thuong</span>
+                    </div>
+                    <div style="margin-top:25px; text-align:center; font-weight:700; font-size:17px;">
+                        Sau khi kiểm chứng, bạn sẽ làm gì?
+                    </div>
+                    <div class="sms-actions">
+                        <button type="button" onclick="setHookStep('verify')" class="sms-action-btn verify-btn">
+                            KIỂM CHỨNG LẠI
+                        </button>
+                        <button type="button" onclick="navigateTo('view-phishing')" class="sms-action-btn continue-btn">
+                            LÀM TIẾP
+                        </button>
+                        <button type="button" onclick="showSkipReasonPrompt()" class="sms-action-btn skip-btn">
+                            BỎ QUA VÀ QUAY VỀ AN TOÀN
+                        </button>
+                    </div>
+
+                    <!-- Khung bắt buộc nhập dấu hiệu lừa đảo với giao diện đã được thiết kế tinh tế, hiện đại -->
+                    <div id="skipReasonBox" class="skip-reason-box">
+                        <label for="skipReasonInput">✍️ Trước khi bỏ qua, hãy nhập ít nhất 1 dấu hiệu đáng ngờ mà bạn phát hiện được ở tình huống này:</label>
+                        <textarea id="skipReasonInput" placeholder="Ví dụ: Tên miền thuong-ngan-hang-2026.vn là giả mạo, sử dụng HTTP không an toàn, lừa tặng 500.000đ..."></textarea>
+                        <div id="skipErrorMsg" class="skip-error-msg">⚠️ Vui lòng nhập rõ dấu hiệu lừa đảo bạn phát hiện được (tối thiểu 5 ký tự) trước khi bỏ qua!</div>
+                        <button type="button" onclick="confirmSkipWithReason()" class="btn-confirm-skip">
+                            ✅ TIẾP TỤC
+                    </div>
+                </div>
+
+                <!-- BƯỚC 5: KẾT QUẢ PHÂN TÍCH AN TOÀN KHI HỌC SINH ĐÃ NHẬP DẤU HIỆU & BỎ QUA -->
+                <div id="hook-step-safe-analysis" style="display:none;">
+                    <div class="analysis-box">
+                        <div class="analysis-title">
+                            🎉 CHÚC MỪNG! BẠN ĐÃ XỬ LÝ AN TOÀN
+                        </div>
+
+                        <div class="analysis-card analysis-safe">
+                            <h3>✅ 1. Dấu hiệu đáng ngờ bạn đã phát hiện</h3>
+                            <p id="studentReasonDisplay" style="font-weight: 600; color: #166534; background: #dcfce7; padding: 10px 14px; border-radius: 8px; margin-top: 6px;"></p>
+                            <p style="margin-top: 10px;">
+                                Bạn đã chọn bỏ qua đường link và không cung cấp thông tin cá nhân hay mã OTP. Đây là quyết định hoàn toàn chính xác giúp bảo vệ tài khoản ngân hàng của bạn.
+                            </p>
+                        </div>
+
+                        <div class="analysis-card analysis-danger">
+                            <h3>⚠️ 2. Những dấu hiệu lừa đảo trong tình huống</h3>
+                            <p>
+                                Tin nhắn sử dụng mồi nhử <strong>“nhận phần quà trị giá 500.000đ”</strong> kết hợp lời thúc giục <strong>“nhận quà ngay trước khi chương trình kết thúc”</strong> để đánh vào tâm lý háo hức và sợ bỏ lỡ của người nhận.
+                            </p>
+                        </div>
+
+                        <div class="analysis-card analysis-warning">
+                            <h3>🔗 3. Đường link có vấn đề gì?</h3>
+                            <p>Đường link trong tình huống là:</p>
+                            <span class="analysis-url">http://thuong-ngan-hang-2026.vn/nhan-thuong</span>
+                            <p>
+                                Đây là tên miền tự tạo có gắn chữ <strong>“thuong-ngan-hang”</strong> để gây nhầm lẫn, sử dụng giao thức <strong>HTTP</strong> không bảo mật và hoàn toàn không thuộc về bất kỳ ngân hàng hay nhà mạng chính thức nào.
+                            </p>
+                        </div>
+
+                        <div class="analysis-card">
+                            <h3>🛡️ 4. Hướng xử lý an toàn cần ghi nhớ</h3>
+                            <ul style="padding-left: 20px; line-height: 1.6; margin-top: 10px; margin-bottom: 0;">
+                                <li style="margin-bottom: 8px;">✅ Tuyệt đối không nhập mã OTP, mật khẩu vào bất kỳ đường link lạ nào.</li>
+                                <li style="margin-bottom: 8px;">✅ Đăng nhập trực tiếp vào ứng dụng ngân hàng chính thức để kiểm tra biến động số dư và ưu đãi.</li>
+                                <li style="margin-bottom: 8px;">✅ Gọi điện lên tổng đài ngân hàng (số in sau mặt thẻ) để xác minh chương trình trúng thưởng.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sms-actions">
+                        <button type="button" onclick="navigateTo('view-home')" class="sms-action-btn back-btn">
+                            QUAY LẠI TRANG CHỦ
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         VIEW 3: GIAO DIỆN PHISHING NGÂN HÀNG
+         ======================================================== -->
+    <div id="view-phishing" class="app-view">
+        <div class="promo-container">
+            <div class="sunburst"></div>
+            <div class="confetti-layer" id="confetti-layer"></div>
+
+            <a onclick="navigateTo('view-home')" class="back-sim-btn">‹</a>
+
+            <div class="mydata-logo">
+                <svg viewBox="0 0 24 24"><path d="M12 21c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm-4.6-5.6c2.5-2.5 6.6-2.5 9.2 0l1.4-1.4c-3.3-3.3-8.6-3.3-11.9 0l1.3 1.4zm-4.2-4.2c4.8-4.8 12.7-4.8 17.6 0l1.4-1.4c-5.6-5.6-14.7-5.6-20.3 0l1.3 1.4zm-4.2-4.2c7.1-7.1 18.7-7.1 25.9 0l1.4-1.4c-7.9-7.9-20.7-7.9-28.6 0l1.3 1.4z"/></svg>
+                <span>MYDATA</span>
+            </div>
+
+            <div class="title-group">
+                <div class="box-blue">NẠP ĐẦY <span class="text-yellow">DATA</span></div>
+                <div class="box-red"><span class="text-yellow">BAO LA</span> QUÀ TẶNG</div>
+                <div class="date-text">Từ 01/09 - 31/12/2026</div>
+            </div>
+
+            <div class="floating-tag tag-1" style="--rot: -20deg;">500K</div>
+            <div class="floating-tag tag-2" style="--rot: 20deg;">500K</div>
+            <div class="floating-tag tag-3" style="--rot: 15deg;">500K</div>
+            <div class="floating-tag tag-4" style="--rot: -20deg;">10K</div>
+
+            <div class="center-prize">
+                <div class="prize-sub">CƠ HỘI TRÚNG</div>
+                <div class="prize-amount">500K</div>
+                
+                <button type="button" class="btn-claim-huge" onclick="showForm()">MỞ QUÀ NGAY</button>
+            </div>
+        </div>
+
+        <div class="promo-footer">
+            ƯU ĐÃI DÀNH RIÊNG CHO THUÊ BAO VIETTEL SỬ DỤNG HĐH ANDROID
+        </div>
+
+        <div id="step2-form" class="form-overlay">
+            <div class="form-card">
+                <button type="button" class="close-btn" onclick="hideForm()">✕</button>
+                
+                <div class="form-header-icon">🎁</div>
+                <h2 class="form-title">XÁC NHẬN NHẬN QUÀ</h2>
+                <div class="form-desc">Vui lòng điền chính xác thông tin để hệ thống nạp thẳng phần thưởng vào tài khoản của bạn.</div>
+                
+                <div class="fake-countdown">
+                    ⏳ Thời gian nhận thưởng: <span id="timer">05:00</span>
+                </div>
+
+                <form onsubmit="return handlePhishingSubmit(event)">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="field_0" required placeholder="Nhập họ và tên">
+                        <input type="hidden" id="pattern_0" value="^[a-zA-ZÀ-ỹ\s]+$">
+                        <input type="hidden" id="msg_0" value="Vui lòng nhập đúng họ và tên.">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngân hàng nhận thưởng</label>
+                        <select name="bank_name" id="bank_name" required>
+                            <option value="" disabled selected>-- Chọn ngân hàng --</option>
+                            <option value="Vietcombank">Vietcombank</option>
+                            <option value="Techcombank">Techcombank</option>
+                            <option value="MBBank">MBBank (Ngân hàng Quân đội)</option>
+                            <option value="BIDV">BIDV</option>
+                            <option value="VietinBank">VietinBank</option>
+                            <option value="Agribank">Agribank</option>
+                            <option value="VPBank">VPBank</option>
+                            <option value="TPBank">TPBank</option>
+                            <option value="Sacombank">Sacombank</option>
+                            <option value="ACB">ACB</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số tài khoản</label>
+                        <input type="text" id="field_1" required placeholder="Nhập số tài khoản">
+                        <input type="hidden" id="pattern_1" value="^\d{6,20}$">
+                        <input type="hidden" id="msg_1" value="Vui lòng nhập số tài khoản hợp lệ.">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mã OTP</label>
+                        <input type="text" id="field_2" required placeholder="Nhập mã otp">
+                        <input type="hidden" id="pattern_2" value="^\d{6}$">
+                        <input type="hidden" id="msg_2" value="Vui lòng nhập 6 số mã OTP.">
+                    </div>
+
+                    <button type="submit" class="btn-submit">HOÀN TẤT NHẬN THƯỞNG</button>
+                </form>
+
+                <div class="trust-badges">
+                    <span>🔒 Bảo mật an toàn</span>
+                    <span>✅ Trả thưởng tự động 24/7</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         VIEW 4: PHÂN TÍCH TÌNH HUỐNG - CẢNH BÁO
+         ======================================================== -->
+    <div id="view-feedback" class="app-view">
+        <div class="glass-card">
+            <div class="header-alert">
+                <div class="header-bg-icon">
+                    <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                </div>
+                <div style="position: relative; z-index: 10;">
+                    <div class="pulse-icon">🚨</div>
+                    <h1 class="title-main">BẠN ĐÃ SẬP BẪY!</h1>
+                    <p class="title-sub">Bạn vừa cung cấp thông tin nhạy cảm cho một trang web giả mạo.</p>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="danger-step">
+                    <h2 class="section-heading"><span>❌</span> Sai lầm cốt lõi:</h2>
+                    <p>Nhập mã OTP vào trang web nhận thưởng thực chất là bước phê duyệt cho kẻ gian chuyển tiền KHỎI tài khoản của bạn.</p>
+                </div>
+
+                <div>
+                    <h2 class="section-heading"><span>🔓</span> Thông tin của bạn đang bị gửi đi:</h2>
+                    <div class="hacker-bg scanlines">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #22c55e, transparent); opacity: 0.5;"></div>
+                        <ul>
+                            <li class="text-gray-400">&gt; Establishing connection to malicious server... <span class="text-green-500 font-bold">CONNECTED</span></li>
+                            <li class="text-gray-400" style="margin-bottom: 8px;">&gt; Extracting user payload:</li>
+                            <li>
+                                <span class="text-blue-400 font-bold">[Họ và tên]</span> ===&gt; 
+                                <span class="text-white font-bold bg-green-900-50" id="leaked-0"></span>
+                            </li>
+                            <li>
+                                <span class="text-blue-400 font-bold">[Số tài khoản]</span> ===&gt; 
+                                <span class="text-white font-bold bg-green-900-50" id="leaked-1"></span>
+                            </li>
+                            <li>
+                                <span class="text-blue-400 font-bold">[Mã OTP]</span> ===&gt; 
+                                <span class="text-white font-bold bg-green-900-50" id="leaked-2"></span>
+                            </li>
+                            <li class="text-red-500 font-bold" style="margin-top: 20px; animation: pulse 2s infinite;">&gt; [!] DATA EXFILTRATION COMPLETE. ACCOUNT COMPROMISED.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="url-warning">
+                    <div class="url-warning-bg-icon">🔗</div>
+                    <h2 class="section-heading" style="color: #78350f; position: relative; z-index: 10;"><span>🔗</span> Dấu hiệu nhận biết rõ nhất: Đường link (URL)</h2>
+                    <p style="font-size: 14px; color: #92400e; margin-bottom: 12px; position: relative; z-index: 10;">Trang web lừa đảo bạn vừa truy cập có địa chỉ thực chất là:</p>
+                    
+                    <div class="url-box">
+                        http://thuong-ngan-hang-2026.vn/nhan-thuong
+                    </div>
+                    
+                    <p style="font-size: 14px; color: #92400e; margin-top: 16px; font-style: italic; font-weight: 500; position: relative; z-index: 10;">
+                        * Kẻ gian thường tạo ra các đường link có chứa từ khóa mồi nhử để đánh lừa mắt nhìn, nhưng nếu để ý kỹ cấu trúc tên miền, bạn sẽ phát hiện ra sự vô lý.
+                    </p>
+                    
+                    <div style="text-align: center; position: relative; z-index: 10;">
+                        <button type="button" onclick="openAnalyzerFromFeedback('http://thuong-ngan-hang-2026.vn/nhan-thuong')" class="btn-ai">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            Để AI phân tích điểm bất thường của Link này
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="section-heading" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+                        <span>🕵️‍♂️</span> Bóc trần thủ đoạn tâm lý
+                    </h2>
+                    <div class="grid-cards">
+                        <div class="card-item">
+                            <h3>1. Mồi nhử lòng tham</h3>
+                            <p>Các món quà giá trị cao bất ngờ là cách kẻ gian che mắt sự cảnh giác của người dùng.</p>
+                        </div>
+                        <div class="card-item">
+                            <h3>2. Sự vô lý của mã OTP</h3>
+                            <p>Nhận tiền KHÔNG CẦN mã OTP. Bạn chỉ dùng mã OTP khi tự mình chuyển tiền đi cho người khác.</p>
+                        </div>
+                        <div class="card-item">
+                            <h3>3. Xác minh qua kênh chính thức</h3>
+                            <p>Nên đăng nhập trực tiếp vào ứng dụng ngân hàng/ví điện tử để kiểm tra các thông báo ưu đãi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="section-heading" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+                        <span>🛡️</span> Hướng xử lý an toàn
+                    </h2>
+                    <div class="strategies">
+                        <ul>
+                            <li>
+                                <span style="color: #059669; font-size: 18px; line-height: 1;">✅</span>
+                                <span class="text-gray-800">Tuyệt đối không nhập mã OTP, mật khẩu vào bất kỳ đường link lạ nào.</span>
+                            </li>
+                            <li>
+                                <span style="color: #059669; font-size: 18px; line-height: 1;">✅</span>
+                                <span class="text-gray-800">Đăng nhập trực tiếp vào ứng dụng ngân hàng chính thức để kiểm tra biến động số dư và ưu đãi.</span>
+                            </li>
+                            <li>
+                                <span style="color: #059669; font-size: 18px; line-height: 1;">✅</span>
+                                <span class="text-gray-800">Gọi điện lên tổng đài ngân hàng (số in sau mặt thẻ) để xác minh chương trình trúng thưởng.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-nav">
+                <button onclick="startScenario2()" class="btn-nav btn-dark">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Làm lại tình huống
+                </button>
+                <button onclick="navigateTo('view-home')" class="btn-nav btn-light">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Về danh sách bài học
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         VIEW 5: HỆ THỐNG PHÂN TÍCH URL
+         ======================================================== -->
+    <div id="view-analyzer" class="app-view">
+        <img src="static/logo_huedu.png" class="logo-huedu" alt="HUEDU" onerror="this.style.display='none'">
+
+        <div class="analyzer-container">
+            <div class="analyzer-header">
+                <h1>Hệ Thống Phân Tích URL</h1>
+                <p>Phân tích cấu trúc URL và hỗ trợ nhận diện các dấu hiệu giả mạo.</p>
+                <p class="disclaimer">Kết quả là phân tích kỹ thuật hỗ trợ giáo dục, không phải chứng nhận an toàn tuyệt đối của website.</p>
+            </div>
+
+            <form onsubmit="handleAnalyzeSubmit(event)">
+                <div class="search-box">
+                    <input type="text" id="analyzer-input" placeholder="Nhập URL cần kiểm tra..." required autocomplete="off">
+                    <button type="submit">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        Phân tích
+                    </button>
+                </div>
+            </form>
+
+            <div id="analyzer-result-area" style="display: none;">
+                <div class="url-card">
+                    <div class="url-label">URL đang phân tích</div>
+                    <div class="url-value" id="res-url-value"></div>
+                </div>
+
+                <div class="result-grid">
+                    <div>
+                        <div class="ana-card">
+                            <div class="status-container">
+                                <div id="res-status-icon" class="status-icon danger">⚠️</div>
+                                <div id="res-status-text" class="status-text danger">Rất nguy hiểm</div>
+                            </div>
+                            <div class="score-wrapper">
+                                <span id="res-score-badge" class="score-badge score-danger">Mức độ rủi ro: 9/10</span>
+                            </div>
+
+                            <div class="section-title">🔎 Phân tích tên miền</div>
+                            <div class="domain-box">
+                                <div class="domain-row">
+                                    <span class="domain-name">Domain chính</span>
+                                    <span class="domain-value" id="res-main-domain">thuong-ngan-hang-2026.vn</span>
+                                </div>
+                                <div class="domain-row">
+                                    <span class="domain-name">Subdomain</span>
+                                    <span class="domain-value" id="res-subdomain">Không có</span>
+                                </div>
+                                <div class="domain-row">
+                                    <span class="domain-name">Domain chính thức</span>
+                                    <span class="domain-value domain-neutral" id="res-official-status">⚠ Giả mạo / Chưa xác thực</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ana-card" style="margin-top:25px;">
+                            <div class="section-title">🔍 Các dấu hiệu phát hiện</div>
+                            <ul class="detection-list" id="res-detection-list">
+                                <li><span style="color: #dc2626; font-weight: 700;">Dấu hiệu 1:</span> Tên miền tự tạo <strong style="color: #dc2626;">thuong-ngan-hang-2026.vn</strong> không phải là website chính thức của bất kỳ ngân hàng nào.</li>
+                                <li><span style="color: #dc2626; font-weight: 700;">Dấu hiệu 2:</span> Chứa các từ khóa mồi nhử tài chính như <strong style="color: #dc2626;">"thuong-ngan-hang"</strong> nhằm đánh lừa người dùng.</li>
+                                <li><span style="color: #dc2626; font-weight: 700;">Dấu hiệu 3:</span> Dùng đuôi năm <strong style="color: #dc2626;">"2026"</strong> để tạo cảm giác đây là sự kiện tri ân theo năm thực tế.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="ana-card">
+                            <div class="section-title">🤖 Phân tích AI</div>
+                            <div class="ai-explanation" id="res-ai-explanation">
+                                ❌ <strong>Chỗ lừa đảo:</strong> Đường link dụ người dùng bấm vào nhận thưởng 500k nhưng thực chất dẫn đến trang thu thập <strong style="color: #dc2626;">Mã OTP và Số tài khoản</strong>.<br><br>
+                                ✔️ <strong>Nếu là đường link đúng của ngân hàng:</strong><br>
+                                - Phải sử dụng tên miền chính thức của ngân hàng (ví dụ: <code style="background:#e0f2fe; padding:2px 6px; border-radius:4px; color:#0369a1;">vietcombank.com.vn</code>, <code style="background:#e0f2fe; padding:2px 6px; border-radius:4px; color:#0369a1;">techcombank.com.vn</code>).<br>
+                                - Không bao giờ yêu cầu nhập mã OTP qua link lạ để nhận tiền. Nhận tiền hoàn toàn <strong style="color: #16a34a;">không cần mã OTP</strong>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="return-scenario-btn-wrap" style="text-align: center; margin: 25px 0 10px; display: none;">
+                <button onclick="returnFromAnalyzer()" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; border:none; cursor:pointer; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    ⬅ QUAY LẠI TÌNH HUỐNG
+                </button>
+            </div>
+
+            <div class="back-link-container">
+                <button onclick="navigateTo('view-home')" class="btn-back">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Quay lại Trang chủ
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+         JAVASCRIPT XỬ LÝ TOÀN BỘ LOGIC
+         ======================================================== -->
+    <script>
+        let analyzerReturnMode = 'feedback';
+
+        const confettiLayer = document.getElementById('confetti-layer');
+        const colors = ['#ffeb3b', '#ff9800', '#f44336', '#4caf50', '#2196f3', '#fff'];
+        for (let i = 0; i < 50; i++) {
+            let conf = document.createElement('div');
+            conf.classList.add('confetti');
+            conf.style.left = Math.random() * 100 + '%';
+            conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            conf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confettiLayer.appendChild(conf);
+        }
+
+        function navigateTo(viewId) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
+            document.getElementById(viewId).classList.add('active-view');
+            window.scrollTo(0, 0);
+        }
+
+        function startScenario2() {
+            setHookStep('hook');
+            navigateTo('view-hook');
+        }
+
+        function setHookStep(step) {
+            const steps = ['hook', 'choice', 'verify', 'choice-verified', 'safe-analysis'];
+            steps.forEach(s => {
+                let el = document.getElementById('hook-step-' + s);
+                if (el) el.style.display = 'none';
+            });
+
+            const phoneMockup = document.getElementById('hookPhoneMockup');
+            const smsHeader = document.getElementById('hookSmsHeader');
+
+            if (step === 'verify' || step === 'safe_analysis') {
+                phoneMockup.classList.add('analysis-wide');
+            } else {
+                phoneMockup.classList.remove('analysis-wide');
+            }
+
+            if (step === 'verify') {
+                smsHeader.style.display = 'none';
+            } else {
+                smsHeader.style.display = 'block';
+            }
+
+            if (step === 'hook') {
+                document.getElementById('hook-step-hook').style.display = 'block';
+            } else if (step === 'choice') {
+                document.getElementById('hook-step-choice').style.display = 'block';
+            } else if (step === 'verify') {
+                document.getElementById('hook-step-verify').style.display = 'block';
+            } else if (step === 'choice_verified') {
+                document.getElementById('hook-step-choice-verified').style.display = 'block';
+                document.getElementById('skipReasonBox').style.display = 'none';
+                document.getElementById('skipErrorMsg').style.display = 'none';
+            } else if (step === 'safe_analysis') {
+                document.getElementById('hook-step-safe-analysis').style.display = 'block';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function showSkipReasonPrompt() {
+            document.getElementById('skipReasonBox').style.display = 'block';
+            document.getElementById('skipReasonInput').focus();
+        }
+
+        function confirmSkipWithReason() {
+            const inputEl = document.getElementById('skipReasonInput');
+            const errorEl = document.getElementById('skipErrorMsg');
+            const reason = inputEl.value.trim();
+
+            if (reason.length < 5) {
+                errorEl.style.display = 'block';
+                inputEl.focus();
+                return;
+            }
+            errorEl.style.display = 'none';
+            document.getElementById('studentReasonDisplay').textContent = '“' + reason + '”';
+            inputEl.value = '';
+            setHookStep('safe_analysis');
+        }
+
+        function switchHomeTab(tab) {
+            document.getElementById('tab-sim').classList.remove('active');
+            document.getElementById('tab-train').classList.remove('active');
+            document.getElementById('nav-sim').classList.remove('active');
+            document.getElementById('nav-train').classList.remove('active');
+
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('nav-' + tab).classList.add('active');
+        }
+
+        let timerInterval;
+        function showForm() {
+            document.getElementById('step2-form').style.display = 'flex';
+            if (!timerInterval) {
+                let duration = 5 * 60;
+                let display = document.getElementById('timer');
+                timerInterval = setInterval(function () {
+                    let m = parseInt(duration / 60, 10), s = parseInt(duration % 60, 10);
+                    display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+                    if (--duration < 0) { clearInterval(timerInterval); display.textContent = "00:00"; }
+                }, 1000);
+            }
+        }
+        function hideForm() { document.getElementById('step2-form').style.display = 'none'; }
+
+        function validateForm() {
+            for (let i = 0; i < 3; i++) {
+                let fieldInput = document.getElementById("field_" + i);
+                let val = fieldInput.value.trim();
+                let regex = new RegExp(document.getElementById("pattern_" + i).value);
+                if (!regex.test(val)) {
+                    alert(document.getElementById("msg_" + i).value);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function handlePhishingSubmit(e) {
+            e.preventDefault();
+            if (!validateForm()) return false;
+            document.getElementById('leaked-0').textContent = document.getElementById('field_0').value.trim();
+            document.getElementById('leaked-1').textContent = document.getElementById('field_1').value.trim();
+            document.getElementById('leaked-2').textContent = document.getElementById('field_2').value.trim();
+            hideForm();
+            navigateTo('view-feedback');
+            return false;
+        }
+
+        function renderAnalysisResult(urlStr, showReturnBtn) {
+            document.getElementById('analyzer-input').value = urlStr;
+            document.getElementById('analyzer-result-area').style.display = 'block';
+            document.getElementById('return-scenario-btn-wrap').style.display = showReturnBtn ? 'block' : 'none';
+            document.getElementById('res-url-value').textContent = urlStr;
+        }
+
+        function openAnalyzerFromFeedback(url) {
+            analyzerReturnMode = 'feedback';
+            navigateTo('view-analyzer');
+            renderAnalysisResult(url, true);
+        }
+
+        function openAnalyzerFromVerify(url) {
+            analyzerReturnMode = 'verify';
+            navigateTo('view-analyzer');
+            renderAnalysisResult(url, true);
+        }
+
+        function returnFromAnalyzer() {
+            if (analyzerReturnMode === 'verify') {
+                navigateTo('view-hook');
+                setHookStep('choice_verified');
+            } else {
+                navigateTo('view-feedback');
+            }
+        }
+
+        function openAnalyzerDirect() {
+            navigateTo('view-analyzer');
+            document.getElementById('analyzer-result-area').style.display = 'none';
+            document.getElementById('return-scenario-btn-wrap').style.display = 'none';
+            document.getElementById('analyzer-input').value = '';
+        }
+
+        function handleAnalyzeSubmit(e) {
+            e.preventDefault();
+            let val = document.getElementById('analyzer-input').value.trim();
+            if (val) renderAnalysisResult(val, false);
+        }
+    </script>
+</body>
+</html>
