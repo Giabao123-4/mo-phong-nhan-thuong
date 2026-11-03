@@ -11,7 +11,7 @@
            ======================================================== */
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; overflow-x: hidden; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .app-view { display: none; min-height: 100vh; width: 100%; position: relative; }
+        .app-view { display: none; min-height: 100vh; min-height: 100dvh; width: 100%; position: relative; }
         .app-view.active-view { display: block; }
 
         /* ========================================================
@@ -223,6 +223,7 @@
             justify-content: center;
             align-items: center;
             min-height: calc(100vh - 80px);
+            min-height: calc(100dvh - 80px);
             width: 100%;
         }
         .phone-mockup {
@@ -435,7 +436,7 @@
         }
 
         /* ========================================================
-           VIEW 3: GIAO DIỆN PHISHING NGÂN HÀNG
+           VIEW 3: GIAO DIỆN PHISHING NGÂN HÀNG (ĐÃ TỐI ƯU CÂN ĐỐI)
            ======================================================== */
         #view-phishing {
             font-family: 'Montserrat', sans-serif;
@@ -447,6 +448,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-height: 100dvh;
         }
         .promo-container {
             position: relative;
@@ -455,13 +457,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 15px;
-            background: radial-gradient(circle at 50% 60%, #ff3333 0%, #a60000 80%, #660000 100%);
+            justify-content: center;
+            gap: clamp(18px, 4vh, 38px);
+            padding: 75px 16px 35px;
+            background: radial-gradient(circle at 50% 55%, #ff3333 0%, #a60000 78%, #660000 100%);
         }
         .sunburst {
             position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
-            background: repeating-conic-gradient(from 0deg at 50% 65%, transparent 0deg 8deg, rgba(255, 255, 255, 0.08) 8deg 16deg);
+            background: repeating-conic-gradient(from 0deg at 50% 55%, transparent 0deg 8deg, rgba(255, 255, 255, 0.08) 8deg 16deg);
             z-index: 1; pointer-events: none;
             animation: rotateSunburst 60s linear infinite;
         }
@@ -481,18 +485,19 @@
             100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         }
         .mydata-logo {
-            position: absolute; top: 20px; right: 25px;
-            background: transparent;
-            border-radius: 8px; padding: 6px 10px;
+            position: absolute; top: 18px; right: 20px;
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 10px; padding: 6px 11px;
             display: flex; flex-direction: column; align-items: center;
             z-index: 10;
             border: 2px solid white;
         }
-        .mydata-logo svg { width: 30px; height: 30px; fill: white; margin-bottom: 2px;}
-        .mydata-logo span { color: white; font-size: 12px; font-weight: 900; letter-spacing: 1px;}
+        .mydata-logo svg { width: 28px; height: 28px; fill: white; margin-bottom: 2px;}
+        .mydata-logo span { color: white; font-size: 11px; font-weight: 900; letter-spacing: 1px;}
 
         .back-sim-btn {
-            position: absolute; top: 20px; left: 25px; z-index: 10;
+            position: absolute; top: 18px; left: 20px; z-index: 10;
             color: white; text-decoration: none; font-size: 24px;
             background: rgba(0,0,0,0.3); width: 42px; height: 42px;
             display: flex; justify-content: center; align-items: center; border-radius: 50%;
@@ -501,47 +506,54 @@
         .back-sim-btn:hover { background: rgba(0,0,0,0.5); }
 
         .title-group {
-            position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; margin-top: 55px;
+            position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;
+            margin: 0;
             width: 100%;
         }
         .box-blue {
             background: #002266;
-            color: white; font-size: 32px; font-weight: 900;
-            padding: 12px 35px; border: 4px solid #ffca28; border-radius: 12px;
+            color: white; font-size: clamp(22px, 5vw, 34px); font-weight: 900;
+            padding: 10px 30px; border: 3.5px solid #ffca28; border-radius: 12px;
             transform: rotate(-3deg);
-            box-shadow: 0 8px 0 #000c24, 0 15px 25px rgba(0,0,0,0.5);
-            margin-bottom: -15px; position: relative; z-index: 2;
+            box-shadow: 0 6px 0 #000c24, 0 12px 20px rgba(0,0,0,0.45);
+            margin-bottom: -6px; position: relative; z-index: 2;
             text-align: center;
+            white-space: nowrap;
         }
         .box-red {
             background: #d32f2f;
-            color: white; font-size: 28px; font-weight: 900;
-            padding: 15px 50px; border: 4px solid white; border-radius: 12px;
-            transform: rotate(3deg);
-            box-shadow: 0 8px 0 #800000, 0 15px 25px rgba(0,0,0,0.5);
+            color: white; font-size: clamp(20px, 4.6vw, 30px); font-weight: 900;
+            padding: 14px 36px 12px; border: 3.5px solid white; border-radius: 12px;
+            transform: rotate(2.5deg);
+            box-shadow: 0 6px 0 #800000, 0 12px 20px rgba(0,0,0,0.45);
             z-index: 1;
             text-align: center;
+            white-space: nowrap;
         }
         .text-yellow { color: #ffca28; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .date-text {
-            color: #fff; font-size: 18px; font-weight: 700; margin-top: 30px;
+            color: #fff; font-size: clamp(14px, 3.6vw, 18px); font-weight: 700; margin-top: 18px;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             z-index: 10;
+            background: rgba(0, 0, 0, 0.22);
+            padding: 5px 16px;
+            border-radius: 999px;
         }
 
         .center-prize {
             position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;
-            margin-top: 25px; justify-content: center; flex-grow: 1; margin-bottom: 40px;
+            justify-content: center;
+            margin: 0;
             width: 100%;
         }
         .prize-sub {
-            font-size: 28px; color: white; font-weight: 900;
+            font-size: clamp(22px, 5vw, 30px); color: white; font-weight: 900;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: -10px; z-index: 4; letter-spacing: 2px;
+            margin-bottom: -6px; z-index: 4; letter-spacing: 2px;
             text-align: center;
         }
         .prize-amount {
-            font-size: 150px; color: #ffca28; font-weight: 900; line-height: 1;
+            font-size: clamp(110px, 26vw, 165px); color: #ffca28; font-weight: 900; line-height: 1;
             text-shadow: 0 6px 0 #e65100, 0 12px 0 #bf360c, 0 20px 40px rgba(0,0,0,0.8);
             z-index: 4; position: relative;
             filter: drop-shadow(0 0 20px rgba(255, 193, 7, 0.5));
@@ -554,43 +566,44 @@
 
         .btn-claim-huge {
             background: linear-gradient(to bottom, #ffeb3b, #ffb300);
-            color: #b71c1c; font-size: 26px; font-weight: 900;
-            padding: 18px 48px; border-radius: 50px; border: 4px solid white;
+            color: #b71c1c; font-size: clamp(20px, 4.8vw, 27px); font-weight: 900;
+            padding: 16px 42px; border-radius: 50px; border: 4px solid white;
             box-shadow: 0 8px 0 #e65100, 0 15px 30px rgba(0,0,0,0.5);
-            cursor: pointer; z-index: 20; position: relative; margin-top: 30px;
+            cursor: pointer; z-index: 20; position: relative; margin-top: 22px;
             text-transform: uppercase; letter-spacing: 1px;
             animation: bounce-btn 1.5s infinite; transition: all 0.1s;
             font-family: 'Montserrat', sans-serif;
             max-width: 90vw;
+            white-space: nowrap;
         }
         .btn-claim-huge:active {
             transform: translateY(8px); box-shadow: 0 0 0 #e65100, 0 5px 10px rgba(0,0,0,0.5);
         }
         @keyframes bounce-btn {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-15px); }
-            60% { transform: translateY(-7px); }
+            40% { transform: translateY(-12px); }
+            60% { transform: translateY(-6px); }
         }
 
         .floating-tag {
             position: absolute; background: white; color: #d32f2f; font-weight: 900;
-            padding: 8px 18px; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            padding: 7px 16px; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
             z-index: 5; animation: floatTag 4s ease-in-out infinite;
-            font-size: 24px; transform-origin: center;
+            font-size: clamp(16px, 4vw, 24px); transform-origin: center;
         }
-        .tag-1 { top: 20%; left: 12%; transform: rotate(-20deg); }
-        .tag-2 { top: 25%; right: 12%; transform: rotate(20deg); animation-delay: 1s;}
-        .tag-3 { bottom: 25%; left: 15%; transform: rotate(15deg); animation-delay: 2s;}
-        .tag-4 { bottom: 20%; right: 15%; transform: rotate(-20deg); animation-delay: 0.5s;}
+        .tag-1 { top: 22%; left: 12%; transform: rotate(-18deg); }
+        .tag-2 { top: 26%; right: 12%; transform: rotate(18deg); animation-delay: 1s;}
+        .tag-3 { bottom: 20%; left: 14%; transform: rotate(14deg); animation-delay: 2s;}
+        .tag-4 { bottom: 18%; right: 14%; transform: rotate(-18deg); animation-delay: 0.5s;}
         
         @keyframes floatTag {
             0%, 100% { transform: translateY(0) rotate(var(--rot)); }
-            50% { transform: translateY(-20px) rotate(var(--rot)); }
+            50% { transform: translateY(-16px) rotate(var(--rot)); }
         }
 
         .promo-footer {
             background: #e65100; color: white; text-align: center;
-            padding: 14px 12px; font-size: 14px; font-weight: 900;
+            padding: 14px 12px; font-size: clamp(12px, 3.2vw, 15px); font-weight: 900;
             position: relative; z-index: 20; border-top: 3px solid #bf360c;
             text-transform: uppercase; line-height: 1.4;
         }
@@ -1033,7 +1046,7 @@
                 width: 100%;
             }
             .hook-wrapper {
-                min-height: calc(100vh - 40px);
+                min-height: calc(100dvh - 40px);
                 align-items: center;
             }
             .phone-mockup,
@@ -1065,7 +1078,12 @@
                 font-size: 18px;
                 margin-right: 10px;
             }
-            /* Giao diện Phishing 500K trên Mobile */
+            /* Giao diện Phishing 500K trên Mobile - Cân đối không khoảng trống thừa */
+            .promo-container {
+                justify-content: center;
+                gap: clamp(20px, 4.5vh, 36px);
+                padding: 68px 14px 28px;
+            }
             .back-sim-btn {
                 top: 14px;
                 left: 14px;
@@ -1076,45 +1094,50 @@
             .mydata-logo {
                 top: 14px;
                 right: 14px;
-                padding: 5px 8px;
+                padding: 5px 9px;
             }
-            .mydata-logo svg { width: 24px; height: 24px; }
-            .mydata-logo span { font-size: 10px; }
-            .title-group { margin-top: 50px; }
+            .mydata-logo svg { width: 22px; height: 22px; }
+            .mydata-logo span { font-size: 9.5px; }
+            .title-group {
+                margin: 0;
+            }
             .box-blue {
-                font-size: 20px;
-                padding: 8px 20px;
+                font-size: clamp(22px, 6.2vw, 27px);
+                padding: 10px 24px;
                 border-width: 3px;
+                margin-bottom: -4px;
             }
             .box-red {
-                font-size: 18px;
-                padding: 10px 26px;
+                font-size: clamp(19px, 5.5vw, 24px);
+                padding: 13px 28px 11px;
                 border-width: 3px;
             }
             .date-text {
                 font-size: 14px;
-                margin-top: 22px;
+                margin-top: 16px;
+                padding: 5px 14px;
             }
             .prize-sub {
-                font-size: 20px;
-                margin-bottom: -5px;
+                font-size: clamp(21px, 5.8vw, 26px);
+                margin-bottom: -4px;
             }
             .prize-amount {
-                font-size: 86px;
+                font-size: clamp(108px, 29vw, 138px);
             }
             .btn-claim-huge {
-                font-size: 18px;
-                padding: 14px 30px;
-                margin-top: 24px;
+                font-size: clamp(19px, 5.2vw, 23px);
+                padding: 15px 36px;
+                margin-top: 20px;
             }
             .floating-tag {
-                font-size: 14px;
-                padding: 4px 10px;
+                font-size: 15px;
+                padding: 5px 12px;
+                border-radius: 7px;
             }
-            .tag-1 { top: 16%; left: 5%; }
-            .tag-2 { top: 20%; right: 5%; }
-            .tag-3 { bottom: 22%; left: 6%; }
-            .tag-4 { bottom: 18%; right: 6%; }
+            .tag-1 { top: 14%; left: 6%; }
+            .tag-2 { top: 16%; right: 6%; }
+            .tag-3 { bottom: 13%; left: 8%; }
+            .tag-4 { bottom: 12%; right: 8%; }
             .promo-footer {
                 font-size: 12px;
                 padding: 12px 10px;
@@ -1429,10 +1452,10 @@
                 <div class="date-text">Từ 01/09 - 31/12/2026</div>
             </div>
 
-            <div class="floating-tag tag-1" style="--rot: -20deg;">500K</div>
-            <div class="floating-tag tag-2" style="--rot: 20deg;">500K</div>
-            <div class="floating-tag tag-3" style="--rot: 15deg;">500K</div>
-            <div class="floating-tag tag-4" style="--rot: -20deg;">10K</div>
+            <div class="floating-tag tag-1" style="--rot: -18deg;">500K</div>
+            <div class="floating-tag tag-2" style="--rot: 18deg;">500K</div>
+            <div class="floating-tag tag-3" style="--rot: 14deg;">500K</div>
+            <div class="floating-tag tag-4" style="--rot: -18deg;">10K</div>
 
             <div class="center-prize">
                 <div class="prize-sub">CƠ HỘI TRÚNG</div>
